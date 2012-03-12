@@ -1,0 +1,59 @@
+Summary: A SCUBA dive logging application for GNOME
+Name: gdivelog
+Version: @VERSION@
+Release: 1
+License: GPL
+Group: Applications/Productivity
+URL: http://gdivelog.sourceforge.net/
+Source0: %{name}-%{version}.tar.bz2
+Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildPrereq: libgnomeui-devel >= 2.10
+Requires: libgnomeui >= 2.10
+BuildPrereq: sqlite-devel >= 3.1.2
+Requires: sqlite >= 3.1.2
+BuildPrereq: bzip2-devel >= 1.0.2
+Requires: bzip2-libs >= 1.0.2
+
+%description 
+gdivelog is a SCUBA dive logging application for GNOME. gdivelog has all the features a SCUBA diver  expects of dive logging software and a few additional features not found in other dive logging software  currently known to the author, for instance the ability to split and merge dives and a tree hierachy for  dive sites. In addition to this gdivelog has a plugin based architecture allowing anyone to write a  plugin to download/manipulate a dive computer, import and export data to and from other dive logs,  create reports or essentially anything you want.
+
+%package devel
+Summary: Header files, libraries and development documentation for %{name}
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description devel
+This package contains the files needed to develop plugins for %{name}.
+
+%prep 
+%setup -q
+
+%build 
+%configure 
+make
+
+%install 
+rm -fr %{buildroot}
+
+%makeinstall
+
+%clean 
+rm -fr %{buildroot}
+
+%files 
+%defattr(-,root,root)
+%doc README COPYING AUTHORS ChangeLog INSTALL NEWS TODO
+%{_bindir}/*  
+%{_datadir}/* 
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/*.h
+
+%changelog 
+
+* Tue Sep 6 2005	Simon Naunton	<snaunton@gmail.com>	
+ - Added docs to files
+
+* Mon Sep 5 2005	Simon Naunton	<snaunton@gmail.com>
+ - Initial.

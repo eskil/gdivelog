@@ -1,0 +1,65 @@
+2005-09-21	Simon Naunton	<snaunton@gmail.com>
+	* disabled Split Dive button when on first and last profile segments because former caused crash and neither makes sense
+	* increased split dive limit to 10M/33ft
+	* Merge dive only adds an extra profile segment if SI > 1 min
+	* Fixed preferences_get_split_dive_limit returning gint instead of gdouble 
+	* Version 5.1
+
+2005-09-19	Simon Naunton	<snaunton@gmail.com>
+	* LEFT JOIN on dive tanks
+        * plugin_interface.sql_query *error_message to **error_message
+
+2005-09-14	Simon Naunton	<snaunton@gmail.com>
+	* Fixed NULL handling for numeric fields so NULL values returned from db do not cause gdivelog to crash
+	* Fixed SAC on tanks tab so it displays L/min or cuft/min correctly
+	* Split Dive Limit added to preferences
+	* Changed behavior of Split Dive button to be consistent with the rest of gdivelog by disabling it if it is not allowed rather than prompting an error
+	* Set pressure and time fields to NULL_[type] when writing dive_tank rows on Split Dive to avoid potential crash
+	* Check plugin directories exist before trying to open them
+	* Fixed bug where plugins in multiple directories would not load properly
+
+2005-09-13	Simon Naunton	<snaunton@gmail.com>
+	* Version 0.5
+
+2005-09-12	Simon Naunton	<snaunton@gmail.com>
+	* Fixed minor bug where end pressure on dive_tank list was being updated with start pressure after save
+	* Added preferences.match_variance
+	* match_var moved to gdivelog, now preferences.match_variance - plugins will need to be recompiled
+	* Fixed major bug where sites window will crash if there are zero sites in the logbook
+  
+2005-09-09	Simon Naunton	<snaunton@gmail.com>
+	* Version 0.4
+
+2005-09-08	Simon Naunton	<snaunton@gmail.com> 
+	* Fixed avg depth calc button sensitivity
+	* Removed an unused variable from dive_gui.c
+	* Default shadow for statistics window list's scrolled window
+
+2005-09-07	Simon Naunton	<snaunton@gmail.com>
+	* Changed the plugin architecture so plugins can obtain a GtkWidget pointer to the main_window. This is so that plugin windows can be set to be children main_window
+	* Changed behavior of Dive -> Merge Next to be consistent with the rest of gdivelog by disabling it if it is not allowed rather than prompting an error
+	* Fixed bug where temporary files where not being deleted if new logbook was created but not saved
+
+2005-09-06	Simon Naunton	<snaunton@gmail.com>
+	* Version 0.3.1
+
+2005-09-06	Simon Naunton	<snaunton@gmail.com>
+	* Added docs to files section in gdivelog.spec.in
+
+2005-09-06	Simon Naunton	<snaunton@gmail.com>
+	* Version 0.3
+	* gtk_window_set_transient_for on child windows
+
+2005-09-05	Simon Naunton	<snaunton@gmail.com>
+	* Finished renumber functionality
+	* Finished about dialog
+
+2005-09-05	Simon Naunton	<snaunton@gmail.com>
+	* Added gdivelog.spec.in and modified configure.in and Makefile.am to generate gdivelog.spec
+	* Added src/renumber_db.{c,h}
+	* Discovered GtkAboutDialog and added code to src/callbacks.c to support this instead of existing about dialog
+
+2005-09-03	Simon Naunton	<snaunton@gmail.com>
+	* Version 0.2
+	* Added About window
+	* Fixed equipment and types label

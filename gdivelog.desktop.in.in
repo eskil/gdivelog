@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=gdivelog
+Comment=SCUBA dive logging software
+Exec=gdivelog
+Icon=@prefix@/share/pixmaps/@PACKAGE@/gdivelog.png
+Terminal=false
+Type=Application
+Categories=Application;X-Diving;
+Encoding=UTF-8
+X-Desktop-File-Install-Version=0.10
