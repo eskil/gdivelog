@@ -1,0 +1,17 @@
+Makefile.in
+Makefile
+config.h
+*~
+autom4te.cache/*
+gdivelog.desktop*
+po/*
+*.Po
+*.o
+stamp-h1
+config.log
+config.status
+gdivelog.spec
+src/gdivelog
+configure
+.tm_project.cache
+intltool*
