@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 
 #include "format_fields.h"
+#include "support.h"
 
 gint sort_func_double(GtkTreeModel *model,GtkTreeIter *a,GtkTreeIter *b,gpointer user_data)
 {
@@ -30,8 +31,8 @@ gint sort_func_double(GtkTreeModel *model,GtkTreeIter *a,GtkTreeIter *b,gpointer
   gchar *str1,*str2;
   double d1,d2;
 
-  gtk_tree_model_get(model,a,(gint)user_data,&str1,-1);
-  gtk_tree_model_get(model,b,(gint)user_data,&str2,-1);
+  gtk_tree_model_get(model,a,(gpointer)user_data,&str1,-1);
+  gtk_tree_model_get(model,b,(gpointer)user_data,&str2,-1);
   d1=g_strtod(str1,NULL);
   d2=g_strtod(str2,NULL);
   g_free(str1);
@@ -46,8 +47,8 @@ gint sort_func_time(GtkTreeModel *model,GtkTreeIter *a,GtkTreeIter *b,gpointer u
   gchar *str1, *str2;
   glong l1, l2;
 
-  gtk_tree_model_get(model,a,(gint)user_data,&str1,-1);
-  gtk_tree_model_get(model,b,(gint)user_data,&str2,-1);
+  gtk_tree_model_get(model,a,(gpointer)user_data,&str1,-1);
+  gtk_tree_model_get(model,b,(gpointer)user_data,&str2,-1);
   l1=format_field_get_time_value(str1);
   l2=format_field_get_time_value(str2);
   g_free(str1);
@@ -58,7 +59,7 @@ gint sort_func_time(GtkTreeModel *model,GtkTreeIter *a,GtkTreeIter *b,gpointer u
 gint sort_func_long(GtkTreeModel *model,GtkTreeIter *a,GtkTreeIter *b,gpointer user_data)
 {
   glong l1, l2;
-  gtk_tree_model_get(model,a,(gint)user_data,&l1,-1);
-  gtk_tree_model_get(model,b,(gint)user_data,&l2,-1);
+  gtk_tree_model_get(model,a,(gpointer)user_data,&l1,-1);
+  gtk_tree_model_get(model,b,(gpointer)user_data,&l2,-1);
   return (gint)(l1-l2);
 }

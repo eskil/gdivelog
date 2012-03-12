@@ -27,6 +27,7 @@
 #include "defines.h"
 #include "gdivelog.h"
 #include "format_fields.h"
+#include "support.h"
 
 #define CHART_MARGIN_LEFT 40	/* Where to start drawing profile, not margin of whole chart */
 #define CHART_MARGIN_RIGHT 10
@@ -96,7 +97,6 @@ static void profile_set_segment_data_fields(glong time,gdouble depth,gdouble tem
   timestr=format_field_duration(time);
   if(depth>preferences.split_dive_limit || !time || time==profile_data.duration) gtk_widget_set_sensitive(GTK_WIDGET(widget_split_dive_btn),FALSE);
   else gtk_widget_set_sensitive(GTK_WIDGET(widget_split_dive_btn),TRUE);
-  if(preferences.depth_unit != 'm') depth=convert_meters_to_feet(depth);
   depthstr=format_field_depth(depth);
   if(preferences.temperature_unit!='c') temperature=convert_celsius_to_farenheit(temperature);
   temperaturestr=format_field_temperature(temperature);

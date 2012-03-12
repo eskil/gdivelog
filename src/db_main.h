@@ -38,6 +38,6 @@ gboolean db_begin_transaction(void);
 gboolean db_commit_transaction(void);
 gboolean db_rollback_transaction(void);
 
-gint db_execute_query(gchar *statement,gpointer callback,gpointer user_data,gchar *error_message);
+gint db_execute_query(gchar *statement,gpointer callback,gpointer user_data,gchar **error_message);
 gchar *db_get_last_dive_datetime(void);
 #endif /* DB_MAIN_H */

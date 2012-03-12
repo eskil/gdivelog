@@ -33,6 +33,7 @@
 #include "site_db.h"
 #include "tank_db.h"
 #include "type_db.h"
+#include "support.h"
 
 extern sqlite3 *logbook_db;
 extern handle_transactions;
@@ -236,7 +237,7 @@ import_buddies (gint dive_id, GArray * buddies)
       if (!rval)
 	{
 	  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR,
-		 "Error in import_buddies()\nbuddy_id=%d\nbuddy_name=%s\n%sbuddy_notes=%s\n",
+		 "Error in import_buddies()\nbuddy_id=%d\nbuddy_name=%s\nbuddy_notes=%s\n",
 		 buddy_data.id, buddy_data.buddy.name,
 		 buddy_data.buddy.notes);
 	  break;
@@ -316,7 +317,7 @@ import_equipment (gint dive_id, GArray * equipment)
       if (!rval)
 	{
 	  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR,
-		 "Error in import_equipment()\nequipment_id=%d\nequipment_name=%s\n%sequipment_notes=%s\n",
+		 "Error in import_equipment()\nequipment_id=%d\nequipment_name=%s\nequipment_notes=%s\n",
 		 equipment_data.id, equipment_data.equipment.name,
 		 equipment_data.equipment.notes);
 	  break;
@@ -391,7 +392,7 @@ import_types (gint dive_id, GArray * types)
       if (!rval)
 	{
 	  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR,
-		 "Error in import_types()\ntype_id=%d\ntype_name=%s\n%stype_notes=%s\n",
+		 "Error in import_types()\ntype_id=%d\ntype_name=%s\ntype_notes=%s\n",
 		 type_data.id, type_data.type.name, type_data.type.notes);
 	  break;
 	}
@@ -474,7 +475,7 @@ import_tanks (gint dive_id, GArray * tanks)
       if (!rval)
 	{
 	  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR,
-		 "Error in import_tanks()\ntank_id=%d\ntank_name=%s\n%stank_notes=%s\n",
+		 "Error in import_tanks()\ntank_id=%d\ntank_name=%s\ntank_notes=%s\n",
 		 tank_data.id, tank_data.tank.name, tank_data.tank.notes);
 	  break;
 	}

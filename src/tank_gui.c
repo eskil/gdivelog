@@ -29,6 +29,7 @@
 #include "helper_functions.h"
 #include "tank_db.h"
 #include "sort_funcs.h"
+#include "support.h"
 
 enum
 {

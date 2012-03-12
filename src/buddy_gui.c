@@ -28,6 +28,7 @@
 #include "format_fields.h"
 #include "helper_functions.h"
 #include "buddy_db.h"
+#include "support.h"
 
 enum
 {

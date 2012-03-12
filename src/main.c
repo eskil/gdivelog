@@ -61,7 +61,7 @@ static void display_error_message(gchar *message)
   dialog=gtk_message_dialog_new(
     GTK_WINDOW (main_window),
     GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
-    GTK_BUTTONS_CLOSE, message
+    GTK_BUTTONS_CLOSE, message, NULL
   );
   g_signal_connect_swapped(dialog,"response",G_CALLBACK(gtk_widget_destroy),dialog);
   gtk_dialog_run(GTK_DIALOG(dialog));
@@ -74,7 +74,7 @@ static void display_message(gchar *message)
   dialog=gtk_message_dialog_new(
     GTK_WINDOW (main_window),
     GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO,
-    GTK_BUTTONS_CLOSE, message
+    GTK_BUTTONS_CLOSE, message, NULL
   );
   g_signal_connect_swapped(dialog,"response",G_CALLBACK (gtk_widget_destroy),dialog);
   gtk_dialog_run(GTK_DIALOG (dialog));
@@ -88,7 +88,7 @@ gboolean prompt_message(gchar *message, GtkMessageType message_type)
   dialog=gtk_message_dialog_new(
     GTK_WINDOW (main_window),
     GTK_DIALOG_DESTROY_WITH_PARENT,message_type,
-    GTK_BUTTONS_YES_NO,message
+    GTK_BUTTONS_YES_NO,message,NULL
   );
   rc=gtk_dialog_run(GTK_DIALOG (dialog));
   gtk_widget_destroy(dialog);

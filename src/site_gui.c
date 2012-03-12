@@ -29,6 +29,7 @@
 #include "helper_functions.h"
 #include "dive_gui.h"
 #include "site_db.h"
+#include "support.h"
 
 enum
 {
@@ -497,7 +498,7 @@ void site_parent_changed(GtkComboBox *combobox,gpointer user_data)
   GtkTreeIter iter;
   
   model=gtk_combo_box_get_model(combobox);
-  gtk_combo_box_get_active_iter(combobox,&iter);
+  if(gtk_combo_box_get_active_iter(combobox,&iter)) {
   gtk_tree_model_get(model,&iter,
     SITEPARENT_COL_SITE_ID,
     &site_parent_id,
@@ -505,4 +506,5 @@ void site_parent_changed(GtkComboBox *combobox,gpointer user_data)
   );
   if((site_parent_id==current_site_id)||site_db_isancestor(site_parent_id,current_site_id))
     site_set_save_sensitive(FALSE);
+}
 }

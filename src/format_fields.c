@@ -85,7 +85,7 @@ gchar *format_field_duration(glong duration)
   else {
     h=duration/3600;
     m=(duration-(h*3600))/60;
-    durationstr=g_strdup_printf("%d:%02d:%02d",h,m,(duration-(h*3600)-(m*60)));
+    durationstr=g_strdup_printf("%d:%02d:%02ld",h,m,(duration-(h*3600)-(m*60)));
   }
   return durationstr;
 }
@@ -150,7 +150,7 @@ glong format_field_get_time_value(gchar *value)
 {
   struct tm t;
 
-  g_strstrip(value);
+  //g_strstrip(value);
   if(!g_utf8_strlen(value,-1)) return NULL_TIME;
   t.tm_hour=0;
   t.tm_min=0;

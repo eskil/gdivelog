@@ -27,6 +27,7 @@
 #include "gdivelog.h"
 #include "helper_functions.h"
 #include "renumber_db.h"
+#include "support.h"
 
 static GtkWidget *renumber_window;
 

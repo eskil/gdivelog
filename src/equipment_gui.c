@@ -28,6 +28,7 @@
 #include "format_fields.h"
 #include "helper_functions.h"
 #include "equipment_db.h"
+#include "support.h"
 
 enum
 {

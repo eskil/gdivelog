@@ -31,6 +31,8 @@
 #include "dive_db.h"
 #include "db_main.h"
 #include "format_fields.h"
+#include "interface.h"
+#include "support.h"
 
 enum
 {
@@ -206,7 +208,7 @@ void plugins_show_window(PluginType plugin_type)
   plugins_window=GTK_WIDGET(create_plugins_window());
   column=gtk_tree_view_column_new_with_attributes(heading,gtk_cell_renderer_text_new(),"text",PLUGIN_COL_DESCRIPTION,NULL);
   g_free(heading);
-  widget_plugins_list=GTK_WIDGET(lookup_widget(GTK_WINDOW(plugins_window),"pluginslist"));
+  widget_plugins_list=GTK_WIDGET(lookup_widget(GTK_WIDGET(plugins_window),"pluginslist"));
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget_plugins_list),column);
   gtk_tree_view_column_set_sort_column_id(column, PLUGIN_COL_DESCRIPTION);
   gtk_tree_view_set_model(GTK_TREE_VIEW(widget_plugins_list),GTK_TREE_MODEL(plugins_liststore));

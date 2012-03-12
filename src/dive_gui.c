@@ -34,6 +34,7 @@
 #include "site_gui.h"
 #include "profile_gui.h"
 #include "sort_funcs.h"
+#include "support.h"
 
 enum
 {
@@ -331,7 +332,7 @@ static void dive_set_dive_SI(time_t dive_start,time_t previous_dive_end)
     if(SI<86401) {
       h=SI/3600;
       m=(SI-(h*3600))/60;
-      SIstr=g_strdup_printf("%d:%02d:%02d",h,m,SI-(h*3600)-(m*60));
+      SIstr=g_strdup_printf("%d:%02d:%02ld",h,m,SI-(h*3600)-(m*60));
     }
     else SIstr = g_strdup ("> 24 hours");
   }

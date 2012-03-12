@@ -39,7 +39,7 @@ gboolean dive_tank_db_dive_tanklist_load_store(gint dive_id,gpointer load_list_d
     sqlite3_free(sqlErrMsg);
     rval=FALSE;
   }
-  g_free(sqlcmd);
+  sqlite3_free(sqlcmd);
   return rval;
 }
 

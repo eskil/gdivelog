@@ -31,6 +31,7 @@
 #include "dive_db.h"
 #include "dive_gui.h"
 #include "db_generic_callbacks.h"
+#include "support.h"
 
 #define SPLIT_DIVE_RANGE_METERS_UPR 10.0
 #define SPLIT_DIVE_RANGE_FEET_UPR 33

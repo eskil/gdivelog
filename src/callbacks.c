@@ -127,7 +127,8 @@ on_about1_activate (GtkMenuItem * menuitem, gpointer user_data)
     gdk_pixbuf_unref(about_dialog_logo_pixbuf);
   }
   gtk_window_set_transient_for(GTK_WINDOW(about_dialog),GTK_WINDOW(main_window));
-  gtk_widget_show(GTK_WIDGET(about_dialog));
+  gtk_dialog_run(GTK_DIALOG(about_dialog));
+  gtk_widget_destroy(GTK_WIDGET(about_dialog));
 }
 
 void on_toolbar_open_clicked (GtkToolButton * toolbutton, gpointer user_data)

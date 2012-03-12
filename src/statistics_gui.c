@@ -30,6 +30,7 @@
 #include "statistics_db.h"
 #include "format_fields.h"
 #include "site_db.h"
+#include "support.h"
 
 enum {
   STATISTICS_COL_NAME=0,
@@ -70,8 +71,8 @@ static gint statistics_load_sites_count_callback(StatisticsLoadSitesData *statis
 {
   gint dive_count,id;
   StatisticsSiteData *statistics_site_data;
-  
-  dive_count=strtol(argv[2],NULL,0);  
+
+  dive_count=strtol(argv[2],NULL,0);
   id=strtol(argv[0],NULL,0);
   statistics_site_data=g_hash_table_lookup(statistics_load_site_data->hash_table,&id);
   statistics_site_data->dive_count=statistics_site_data->dive_count+dive_count;
@@ -89,7 +90,7 @@ static gint statistics_load_sites_callback(StatisticsLoadSitesData *statistics_l
   gint *key;
   GtkTreeIter *iter,*parent_iter;
   StatisticsSiteData *statistics_site_data,*parent_statistics_site_data;
-  
+
   key=g_malloc(sizeof(gint));
   *key=strtol(argv[0],NULL,0);
   statistics_site_data=g_malloc(sizeof(StatisticsSiteData*));
@@ -121,19 +122,19 @@ static void statistics_load_sites(void)
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_sites_tree"));
 
   column=gtk_tree_view_column_new_with_attributes(_("site"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
-  gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);  
+  gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
-  
+
   column=gtk_tree_view_column_new_with_attributes(_("Number Of Dives"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_VALUE,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_VALUE);
-  
+
   statistics_load_site_data.model=GTK_TREE_MODEL(gtk_tree_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG));
-  statistics_load_site_data.hash_table=g_hash_table_new_full(g_int_hash,g_int_equal,g_free,statistics_site_hash_value_destroy);    
-  
+  statistics_load_site_data.hash_table=g_hash_table_new_full(g_int_hash,g_int_equal,g_free,statistics_site_hash_value_destroy);
+
   statistics_db_load_sites((gpointer)&statistics_load_site_data,(gpointer)statistics_load_sites_callback);
   statistics_db_load_sites_count((gpointer)&statistics_load_site_data,(gpointer)statistics_load_sites_count_callback);
- 
+
   g_hash_table_foreach(statistics_load_site_data.hash_table,(GHFunc)statistics_load_sites_show_dive_count,(gpointer)statistics_load_site_data.model);
   g_hash_table_destroy(statistics_load_site_data.hash_table);
 
@@ -144,13 +145,13 @@ static void statistics_load_sites(void)
 static gint statistics_load_list_callback(GtkListStore *list_store,gint argc,gchar **argv,gchar **azColName)
 {
   GtkTreeIter iter;
-  
+
   gtk_list_store_append(list_store,&iter);
   gtk_list_store_set(list_store,&iter,
     STATISTICS_COL_NAME,argv[0],
     STATISTICS_COL_VALUE,strtol(argv[1],NULL,0),
     -1
-  ); 
+  );
   return 0;
 }
 
@@ -160,11 +161,11 @@ static void statistics_load_types(void)
   GtkListStore *list_store;
   GtkTreeIter iter;
   GtkTreeViewColumn *column;
-  
+
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_types_list"));
-  
-  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);  
-  
+
+  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);
+
   column=gtk_tree_view_column_new_with_attributes(_("Type"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
@@ -185,11 +186,11 @@ static void statistics_load_tanks(void)
   GtkListStore *list_store;
   GtkTreeIter iter;
   GtkTreeViewColumn *column;
-  
+
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_tanks_list"));
-  
-  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);  
-  
+
+  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);
+
   column=gtk_tree_view_column_new_with_attributes(_("Type"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
@@ -210,11 +211,11 @@ static void statistics_load_equipment(void)
   GtkListStore *list_store;
   GtkTreeIter iter;
   GtkTreeViewColumn *column;
-  
+
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_equipment_list"));
-  
-  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);  
-  
+
+  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);
+
   column=gtk_tree_view_column_new_with_attributes(_("Equipment"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
@@ -222,7 +223,7 @@ static void statistics_load_equipment(void)
   column=gtk_tree_view_column_new_with_attributes(_("Number of Dives"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_VALUE,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_VALUE);
-  
+
   statistics_db_load_equipment(list_store,statistics_load_list_callback);
 
   gtk_tree_view_set_model(GTK_TREE_VIEW(widget),GTK_TREE_MODEL(list_store));
@@ -235,11 +236,11 @@ static void statistics_load_buddies(void)
   GtkListStore *list_store;
   GtkTreeIter iter;
   GtkTreeViewColumn *column;
-  
+
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_buddies_list"));
-  
-  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);  
-  
+
+  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_LONG);
+
   column=gtk_tree_view_column_new_with_attributes(_("Buddy"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
@@ -247,7 +248,7 @@ static void statistics_load_buddies(void)
   column=gtk_tree_view_column_new_with_attributes(_("Number of Dives"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_VALUE,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_VALUE);
-  
+
   statistics_db_load_buddies(list_store,statistics_load_list_callback);
 
   gtk_tree_view_set_model(GTK_TREE_VIEW(widget),GTK_TREE_MODEL(list_store));
@@ -257,13 +258,13 @@ static void statistics_load_buddies(void)
 static gint statistics_load_depth_range_callback(LoadDepthRangeData *load_depth_range_data,gint argc,gchar **argv,gchar **azColName)
 {
   GtkTreeIter iter;
-  
+
   gtk_list_store_append(load_depth_range_data->list_store,&iter);
   gtk_list_store_set(load_depth_range_data->list_store,&iter,
 	  STATISTICS_COL_NAME,load_depth_range_data->str,
     STATISTICS_COL_VALUE,strtol(argv[0],NULL,0),
     -1
-  ); 
+  );
   return 0;
 }
 
@@ -275,10 +276,10 @@ static void statistics_load_depth_range(gdouble max_depth)
   GtkTreeViewColumn *column;
   gint i,max_depth_int,depth_increment;
   gchar *lwrstr,*uprstr;
-  
+
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_depth_range_list"));
-  depth_range_list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_INT);  
-  
+  depth_range_list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_INT);
+
   column=gtk_tree_view_column_new_with_attributes(_("Depth Range"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
@@ -287,12 +288,12 @@ static void statistics_load_depth_range(gdouble max_depth)
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_VALUE);
 
-  load_depth_range_data.list_store=depth_range_list_store;  
+  load_depth_range_data.list_store=depth_range_list_store;
 
   if(preferences.depth_unit=='m') depth_increment=10;
   else depth_increment=30;
   max_depth_int=((gint)max_depth/depth_increment)*depth_increment+depth_increment;
-  
+
   for(i=0;i<max_depth_int;i+=depth_increment) {
     load_depth_range_data.lwr=(gdouble)i;
     load_depth_range_data.upr=(gdouble)i+depth_increment;
@@ -308,7 +309,7 @@ static void statistics_load_depth_range(gdouble max_depth)
     statistics_db_load_depth_range(&load_depth_range_data,statistics_load_depth_range_callback);
     g_free(load_depth_range_data.str);
   }
-  
+
   gtk_tree_view_set_model(GTK_TREE_VIEW(widget),GTK_TREE_MODEL(depth_range_list_store));
   g_object_unref(GTK_TREE_MODEL(depth_range_list_store));
 }
@@ -319,7 +320,7 @@ static gint statistics_load_totals_callback(GtkListStore *list_store,gint argc,g
   gchar *str,*names[]={"Number of dives","Deepest","Longest","Total duration","Warmest","Coldest"};
   double dbl;
   glong l;
-  
+
   gtk_list_store_append(list_store,&iter);
   gtk_list_store_set(list_store,&iter,
 	  STATISTICS_COL_NAME,_("Total Number of dives"),
@@ -334,27 +335,27 @@ static gint statistics_load_totals_callback(GtkListStore *list_store,gint argc,g
 	  STATISTICS_COL_NAME,_("Deepest"),
     STATISTICS_COL_VALUE,str,
     -1
-  ); 
+  );
   g_free(str);
   statistics_load_depth_range(dbl);
-  
-  l=strtol(argv[2],NULL,NULL,0);
+
+  l=strtol(argv[2],NULL,0);
   str=format_field_duration(l);
   gtk_list_store_append(list_store,&iter);
   gtk_list_store_set(list_store,&iter,
 	  STATISTICS_COL_NAME,_("Longest"),
     STATISTICS_COL_VALUE,str,
     -1
-  );  
+  );
   g_free(str);
-  l=strtol(argv[3],NULL,NULL,0);
+  l=strtol(argv[3],NULL,0);
   str=format_field_duration(l);
   gtk_list_store_append(list_store,&iter);
   gtk_list_store_set(list_store,&iter,
 	  STATISTICS_COL_NAME,_("Total Duration"),
     STATISTICS_COL_VALUE,str,
     -1
-  );  
+  );
   g_free(str);
   dbl=g_strtod(argv[4],NULL);
   if(preferences.temperature_unit!='c') dbl=convert_celsius_to_farenheit(dbl);
@@ -364,7 +365,7 @@ static gint statistics_load_totals_callback(GtkListStore *list_store,gint argc,g
 	  STATISTICS_COL_NAME,_("Warmest"),
     STATISTICS_COL_VALUE,str,
     -1
-  );    
+  );
   g_free(str);
   dbl=g_strtod(argv[5],NULL);
   if(preferences.temperature_unit!='c') dbl=convert_celsius_to_farenheit(dbl);
@@ -374,7 +375,7 @@ static gint statistics_load_totals_callback(GtkListStore *list_store,gint argc,g
     STATISTICS_COL_NAME,_("Coldest"),
     STATISTICS_COL_VALUE,str,
     -1
-  );    
+  );
   g_free(str);
   return 0;
 }
@@ -387,9 +388,9 @@ static void statistics_load_totals(void)
   GtkTreeViewColumn *column;
 
   widget=GTK_WIDGET(lookup_widget(statistics_window,"statistics_totals_list"));
-  
-  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_STRING);  
-  
+
+  list_store=gtk_list_store_new(STATISTICS_NUM_COLS,G_TYPE_STRING,G_TYPE_STRING);
+
   column=gtk_tree_view_column_new_with_attributes(_("Statistic"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_NAME,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_NAME);
@@ -397,9 +398,9 @@ static void statistics_load_totals(void)
   column=gtk_tree_view_column_new_with_attributes(_("Value"),gtk_cell_renderer_text_new(),"text",STATISTICS_COL_VALUE,NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(widget),column);
   gtk_tree_view_column_set_sort_column_id(column,STATISTICS_COL_VALUE);
-  
+
   statistics_db_load_totals(list_store,statistics_load_totals_callback);
-  
+
   gtk_tree_view_set_model(GTK_TREE_VIEW(widget),GTK_TREE_MODEL(list_store));
   g_object_unref(GTK_TREE_MODEL(list_store));
 }
@@ -407,7 +408,7 @@ static void statistics_load_totals(void)
 void statistics_show_window(GtkMenuItem *menuitem,gpointer user_data)
 {
   statistics_window=GTK_WIDGET(create_statistics_window());
-  
+
   statistics_load_totals();
   statistics_load_sites();
   statistics_load_buddies();

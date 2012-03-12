@@ -32,6 +32,7 @@
 #include "dive_tank_db.h"
 #include "dive_gui.h"
 #include "profile_gui.h"
+#include "support.h"
 
 enum
 {
