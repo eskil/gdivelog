@@ -30,7 +30,7 @@
 #define LOGBOOK_APP_DATA_PREFERENCES "/.gdivelog/preferences"
 #define LOGBOOK_APP_DATA_DIR "/.gdivelog"
 
-#define GDIVELOG_SCHEMA_VERSION "1.0"
+#define GDIVELOG_SCHEMA_VERSION "3"
 
 typedef struct
 {

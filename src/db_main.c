@@ -56,6 +56,169 @@ gboolean db_is_saved(void)
   return db_saved_value;
 }
 
+gint db_get_schema_version(sqlite3 *db) {
+  gchar *sqlErrMsg=NULL;
+  gint schema_version=0;
+  gint rc=sqlite3_exec(db,"SELECT gdivelog_schema_version FROM Preferences LIMIT 1;",(gpointer)db_generic_callback_int,&schema_version,&sqlErrMsg);
+  if(rc!=SQLITE_OK) {
+	g_log(G_LOG_DOMAIN,G_LOG_LEVEL_ERROR,"Error in db_needs_upgrade()\nCode=%d\nError Message='%s'\n",rc,sqlErrMsg);
+	sqlite3_free(sqlErrMsg);
+	schema_version = 0;
+  }
+
+  return schema_version;
+}
+
+gboolean db_set_schema_version(sqlite3 *db,gint version) {
+  gchar *sqlErrMsg = NULL;
+  char *sqlcmd=sqlite3_mprintf("UPDATE Preferences SET gdivelog_schema_version = '%d';", version);
+  if(sqlcmd==NULL) {
+	return FALSE;
+  }
+  gint rc=sqlite3_exec(db,sqlcmd,NULL,0,&sqlErrMsg);
+  if(rc!=SQLITE_OK) {
+    g_log(G_LOG_DOMAIN,G_LOG_LEVEL_CRITICAL,"Error in db_set_schema_version()\nCode=%d\nQuery='%s'\nError message='%s'\n",rc,sqlcmd,sqlErrMsg);
+    sqlite3_free(sqlErrMsg);
+    sqlite3_free(sqlcmd);
+    return FALSE;
+  }
+  sqlite3_free(sqlcmd);
+  return TRUE;
+}
+
+gboolean db_needs_upgrade(sqlite3 *db) {
+  gint schema_version = db_get_schema_version(db);
+  return (schema_version!=0) && (schema_version<atoi(GDIVELOG_SCHEMA_VERSION));
+}
+
+gboolean db_run_upgrade_command(sqlite3 *db,const char *sqlcmd) {
+  gchar *sqlErrMsg = NULL;
+  gint rc=sqlite3_exec(db,sqlcmd,NULL,0,&sqlErrMsg);
+  if(rc!=SQLITE_OK) {
+    g_log(G_LOG_DOMAIN,G_LOG_LEVEL_CRITICAL,"Error in db_run_upgrade_command()\nCode=%d\nQuery='%s'\nError message='%s'\n",rc,sqlcmd,sqlErrMsg);
+    sqlite3_free(sqlErrMsg);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+gboolean db_upgrade(sqlite3 *db) {
+  gint schema_version = db_get_schema_version(db);
+
+  /* Upgrade 1 to 2, noop, don't ask... */
+  if (schema_version == 1) {
+	gchar sqlcmd[] = "";
+    if(!db_set_schema_version(db,2)) {
+      return FALSE;
+    }
+	schema_version = 2;
+  }
+
+  /* Upgrade 2 to 3 */
+  if(db_get_schema_version(db) == 2) {
+	/* I managed to decipher what the old triggers were doing, and fix them as needed. I left the SQL
+	   formatting and comments in just for sanity.
+	*/
+    gchar sqlcmd[] =
+      "DROP TRIGGER Dive_Insert; "
+	  "/* "
+	  "   if no dives predate this then "
+	  "      if lowest number is > 1: "
+	  "         lowest number - 1 "
+	  "      else "
+	  "         1 "
+	  "   else "
+	  "       pick most recent +1 "
+	  "*/ "
+	  "CREATE TRIGGER Dive_Insert AFTER INSERT ON Dive "
+	  "BEGIN "
+	  "    UPDATE Dive "
+	  "    SET dive_number= "
+	  "        (SELECT CASE WHEN "
+	  "            /* If there are dives with datetime before this, ie. we're inserting "
+	  "               dives before any others ones in the log. "
+	  "            */ "
+	  "            (SELECT dive_number "
+	  "             FROM Dive "
+	  "             WHERE dive_datetime < NEW.dive_datetime "
+	  "             ORDER BY dive_datetime DESC LIMIT 1) IS NULL THEN "
+	  "                 (SELECT CASE WHEN "
+	  "                     /* Check if the lowest dive number is greater than 1. "
+	  "                        greater-than to prevent inserting 0 or negative. "
+	  "                     */ "
+	  "                     (SELECT MIN(dive_number) "
+	  "                      FROM Dive "
+	  "                      WHERE dive_number > 0) > 1 THEN "
+	  "                          /* if so, select that number minus 1 */ "
+	  "                          (SELECT MIN(dive_number)-1 FROM Dive WHERE dive_number > 1) "
+	  "                      ELSE "
+	  "                          /* Else start at 1 */ "
+	  "                          1 "
+	  "                      END) "
+	  "             ELSE "
+	  "                 /* Common case, pick highest number sorted by datetime, plus 1 */ "
+	  "                 (SELECT MAX(dive_number)+1 "
+	  "                  FROM Dive "
+	  "                  WHERE dive_datetime < NEW.dive_datetime "
+	  "                    AND dive_number > 0 "
+	  "                  ORDER BY dive_datetime DESC LIMIT 1) "
+	  "             END) "
+	  "    WHERE dive_id=NEW.dive_id; "
+	  "END; "
+      "DROP TRIGGER Dive_Update;"
+
+	  "CREATE TRIGGER Dive_Update AFTER "
+	  "UPDATE OF dive_datetime ON Dive BEGIN "
+	  "UPDATE Dive "
+	  "SET dive_number= "
+	  "	  (SELECT CASE "
+	  "        WHEN dive_id = NEW.dive_id THEN "
+	  "            /* The updated dive, set the number to the number of older dives */ "
+	  "            1 + (SELECT COUNT(*) FROM Dive WHERE dive_datetime < NEW.dive_datetime) "
+	  "        WHEN NEW.dive_datetime > OLD.dive_datetime "
+	  "         /* All other dive, move by +/- 1 depending on whether we've moved the datetime "
+	  "            forwards or backwards. "
+	  "          */ "
+	  "         AND dive_datetime <= NEW.dive_datetime "
+	  "         AND dive_datetime >= OLD.dive_datetime THEN "
+	  "	           (SELECT CASE "
+	  "                 WHEN dive_number-1 < OLD.dive_number THEN "
+	  "                     dive_number "
+	  "                 ELSE "
+	  "                     dive_number-1 "
+	  "                 END) "
+	  "        WHEN NEW.dive_datetime < OLD.dive_datetime "
+	  "         AND dive_datetime <= OLD.dive_datetime "
+	  "         AND dive_datetime >= NEW.dive_datetime THEN "
+	  "	           (SELECT CASE "
+	  "                 WHEN dive_number+1 > OLD.dive_number THEN "
+	  "                     dive_number "
+	  "                 ELSE "
+	  "                     dive_number+1 "
+	  "                 END) "
+	  "	       ELSE "
+	  "            dive_number "
+	  "	   END) "
+	  "WHERE "
+	  "   /* Only for dives with datetime between old and new */ "
+	  "	  (SELECT CASE "
+	  "        WHEN NEW.dive_datetime > OLD.dive_datetime THEN "
+	  "            dive_datetime >= OLD.dive_datetime "
+	  "            AND dive_datetime <= NEW.dive_datetime "
+	  "        WHEN NEW.dive_datetime < OLD.dive_datetime THEN "
+	  "            dive_datetime <= OLD.dive_datetime "
+	  "	           AND dive_datetime >= NEW.dive_datetime "
+	  "    END); "
+	  "END; "
+    ;
+    if(!db_run_upgrade_command(db,sqlcmd) || !db_set_schema_version(db,schema_version)) {
+      return FALSE;
+    }
+	schema_version = 3;
+  }
+  return TRUE;
+}
+
 gboolean db_create_schema(sqlite3 *db)
 {
   gint rc;
@@ -108,7 +271,7 @@ gchar *db_get_full_site_name(gchar *site_id)
   gint rc;
   gchar *sqlcmd, *sqlErrMsg = NULL, *site_name;
   SiteData site_data;
-  
+
   current_id=strtol(site_id,NULL,0);
   site_data.site_name=g_string_new(NULL);
   do {
@@ -198,6 +361,14 @@ gboolean db_open(gchar * fname)
     rval=FALSE;
   }
   else {
+    if(db_needs_upgrade(logbook_db)) {
+      if(!db_upgrade(logbook_db)) {
+        g_log (G_LOG_DOMAIN,G_LOG_LEVEL_CRITICAL,"Cannot upgrade database schema\n");
+        sqlite3_close(logbook_db);
+        logbook_db=NULL;
+        rval=FALSE;
+      }
+    }
     db_cache_sites ();
     preferences_load_template_dive_number();
   }
@@ -246,7 +417,7 @@ gboolean db_begin_transaction(void)
   gint rc;
   gchar *sqlErrMsg = NULL;
   gboolean rval=TRUE;
-  
+
   rc= sqlite3_exec(logbook_db,"BEGIN",NULL,0,&sqlErrMsg);
   if(rc != SQLITE_OK) {
     g_log(G_LOG_DOMAIN,G_LOG_LEVEL_CRITICAL,"Error in db_begin()\nCode=%d\nError Message='%s'\n",rc,sqlErrMsg);

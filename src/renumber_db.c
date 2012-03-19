@@ -28,29 +28,48 @@
 
 extern sqlite3 *logbook_db;
 
+static gint renumber_callback(GList **list,gint argc,gchar **argv, gchar **azColName)
+{
+  (*list) = g_list_prepend(*list,GINT_TO_POINTER(atoi(argv[0])));
+  return 0;
+}
+
+gboolean renumber_db_dive(gint dive, gint number)
+{
+  gint rc;
+  gboolean rval=TRUE;
+  gchar *sqlErrMsg=NULL,*sqlcmd=sqlite3_mprintf("UPDATE Dive SET dive_number=%d WHERE dive_id=%d",number,dive);
+
+  rc=sqlite3_exec(logbook_db,sqlcmd,NULL,0,&sqlErrMsg);
+  if(rc!=SQLITE_OK) {
+    g_log(G_LOG_DOMAIN,G_LOG_LEVEL_ERROR,"Error in renumber_db_renumber_dives()\nCode=%d\nError Message='%s'\n",rc,sqlErrMsg);
+    sqlite3_free(sqlErrMsg);
+    rval=FALSE;
+  }
+  else db_not_saved();
+  sqlite3_free(sqlcmd);
+  return rval;
+}
+
 gboolean renumber_db_renumber_dives(gint initial_dive_number)
 {
   gint rc;
   glong min_dive_number;
   gchar *sqlErrMsg=NULL,*sqlcmd=NULL;
   gboolean rval=TRUE;
+  GList *list = g_list_alloc();
 
-  rc=sqlite3_exec(logbook_db,"SELECT MIN(dive_number) FROM Dive",(gpointer)db_generic_callback_long,&min_dive_number,&sqlErrMsg);  
+  rc=sqlite3_exec(logbook_db,"SELECT dive_id FROM Dive ORDER BY dive_datetime DESC;",(gpointer)renumber_callback,&list,&sqlErrMsg);
   if(rc!=SQLITE_OK) {
     g_log(G_LOG_DOMAIN,G_LOG_LEVEL_ERROR,"Error in renumber_db_renumber_dives()\nCode=%d\nError Message='%s'\n",rc,sqlErrMsg);
     sqlite3_free(sqlErrMsg);
     rval=FALSE;
   }
   else {
-    if(min_dive_number!=initial_dive_number) {
-      sqlcmd=sqlite3_mprintf("UPDATE Dive SET dive_number=dive_number+%d",initial_dive_number-min_dive_number);
-      sqlite3_exec(logbook_db,sqlcmd,NULL,0,&sqlErrMsg);
-      if(rc!=SQLITE_OK) {
-        g_log(G_LOG_DOMAIN,G_LOG_LEVEL_ERROR,"Error in renumber_db_renumber_dives()\nCode=%d\nError Message='%s'\n",rc,sqlErrMsg);
-        sqlite3_free(sqlErrMsg);
-        rval=FALSE;
-      }
-      else db_not_saved();
+    GList *it=g_list_first(list);
+    while(it){
+      if(!renumber_db_dive(GPOINTER_TO_INT(it->data),initial_dive_number++)) rval=FALSE;
+      it=g_list_next(it);
     }
   }
   return rval;
